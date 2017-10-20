@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML5 Canvas</title>
+</head>
+<body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.querySelector('#draw');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; //set to browser size, updates the canvas attributes
+        canvas.height = window.innerHeight; //set to browser size, updates the canvas attributes
+        ctx.strokeStyle = '#BADA55';
+        ctx.lineJoin = 'round'; // miter join settings
+        ctx.lineCap = 'round'; // miter join settings
+        ctx.lineWidth = 100; // stroke weight
+        ctx.globalCompositeOperation = 'multiply';
+
+        let isDrawing = false; // flag to test
+        let lastX = 0;
+        let lastY = 0;
+        let hue = 0;
+        let direction = true;
+
+        function draw(e) {
+            if(!isDrawing) return; // stop the fn from running when they are not moused down
+
+            // only runs when mouse is down and moving
+            console.log(e);
+            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`
+
+            ctx.beginPath();
+
+            // start from
+            ctx.moveTo(lastX, lastY); // using the let vars above
+
+            // go to
+            ctx.lineTo(e.offsetX, e.offsetY); // these come the event that has happened
+            ctx.stroke();
+
+            [lastX, lastY] = [e.offsetX, e.offsetY]; // destructing an array, quick way to update multiple vars
+
+            hue++; // increment the hsl var
+
+            if(hue >= 360) {
+                // if hue is greater than or equal to 360, reset to 0
+                hue = 0;
+            }
+
+            if(ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+                // flip direction based on the line width
+                direction = !direction;
+            }
+
+            if(direction) {
+                // increment 0 to 100
+                ctx.lineWidth++;
+            } else {
+                // increment 100 to 0
+                ctx.lineWidth--;
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY]; // stops from starting at 0, 0
+        });
+
+        canvas.addEventListener('mousemove', draw); // on mouse move call draw function
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+    </script>
+
+    <style>
+    html, body {
+        margin:0;
+    }
+    </style>
+
+</body>
+</html>
